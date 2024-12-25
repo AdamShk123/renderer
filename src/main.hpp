@@ -1,6 +1,11 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef MAIN_HPP
+#define MAIN_HPP
 
 #include <iostream>
+#include <cstdint>
 
-#endif // RENDERER_HPP
+#include "renderer.hpp"
+
+void run(const Renderer::Renderer& renderer);
+
+#endif // MAIN_HPP
