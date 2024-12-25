@@ -6,6 +6,6 @@
 
 #include "renderer.hpp"
 
-void run(const Renderer::Renderer& renderer);
+void run(Renderer::Renderer& renderer);
 
 #endif // MAIN_HPP

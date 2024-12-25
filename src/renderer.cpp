@@ -32,6 +32,13 @@ namespace Renderer
 		{
 			throw std::runtime_error(SDL_GetError());
 		}
+
+        m_renderer = SDL_CreateRenderer(m_window, nullptr);
+
+        if(m_renderer == nullptr)
+        {
+            throw std::runtime_error(SDL_GetError());
+        }
 	}
 
 	Renderer::~Renderer()
@@ -41,4 +48,19 @@ namespace Renderer
 
 		SDL_Quit();
 	}
+
+    void Renderer::setDrawColor(const Color& color)
+    {
+        SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
+    }
+
+    void Renderer::clear() const
+    {
+        SDL_RenderClear(m_renderer);
+    }
+
+    void Renderer::present() const
+    {
+        SDL_RenderPresent(m_renderer);
+    }
 }

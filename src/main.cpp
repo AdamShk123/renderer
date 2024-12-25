@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void run(const Renderer::Renderer& renderer) 
+void run(Renderer::Renderer& renderer)
 {
 	std::cout << &renderer << std::endl;
 
@@ -41,6 +41,11 @@ void run(const Renderer::Renderer& renderer)
 				done = true;
 			}
 		}
+
+        Renderer::Color color{0xD0, 0xD0, 0xD0, 0xFF};
+        renderer.setDrawColor(color);
+        renderer.clear();
+        renderer.present();
 
 		last = SDL_GetTicks();
 

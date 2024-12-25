@@ -8,7 +8,7 @@ endif()
 
 add_executable (${PROJECT_NAME} "main.cpp" "renderer.cpp")
 
-target_include_directories(${PROJECT_NAME} PRIVATE "main.hpp")
+target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME} PRIVATE 

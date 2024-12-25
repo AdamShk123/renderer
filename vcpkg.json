@@ -1,9 +1,17 @@
 {
+  "name": "renderer",
+  "version": "1.0.0",
   "dependencies": [
-    "directxtk",
+    {
+      "name": "directxtk",
+      "platform": "windows"
+    },
+    {
+      "name": "glm",
+      "platform": "linux"
+    },
     "gtest",
     "sdl3",
-    "glm",
     "stb"
   ]
 }
