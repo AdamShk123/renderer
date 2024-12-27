@@ -12,12 +12,13 @@
 #include <algorithm>
 #include <ranges>
 
-#include <windows.h>
-
 #include <SDL3/SDL.h>
 
 #include <dxgi1_6.h>
 #include <wrl/client.h>
+#include <d3d11_4.h>
+#include <windows.h>
+#include <D3DCompiler.h>
 
 namespace Renderer
 {
@@ -44,7 +45,9 @@ namespace Renderer
         HWND m_handle = nullptr;
 
         Microsoft::WRL::ComPtr<IDXGIFactory7> m_factory = nullptr;
-        Microsoft::WRL::ComPtr<IDXGIAdapter1> m_adapter = nullptr;
+        Microsoft::WRL::ComPtr<IDXGIAdapter4> m_adapter = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Device5> m_device = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext4> m_context = nullptr;
 
         void initSDL();
         void createFactory();

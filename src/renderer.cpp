@@ -7,6 +7,7 @@ namespace Renderer
 		initSDL();
 		createFactory();
 		findAdapter();
+		createDevice();
 	}
 
 	void Renderer::initSDL() 
@@ -77,6 +78,11 @@ namespace Renderer
 			i += 1;
 		}
 
+		if(adapters.empty())
+		{
+			throw std::runtime_error("No adapters found!");
+		}
+
 		std::vector<DXGI_ADAPTER_DESC1> descriptions(adapters.size());
 
 		auto getDescription = [](IDXGIAdapter1* adapter) -> DXGI_ADAPTER_DESC1
@@ -97,10 +103,9 @@ namespace Renderer
 		// finds adapter with most video memory
 		auto best = std::max_element(descriptions.begin(), descriptions.end(), biggerMemory);
 		auto index = std::distance(descriptions.begin(), best);
-		m_adapter.Attach(adapters[index]);
+		adapters[index]->QueryInterface(m_adapter.GetAddressOf());
 
 		// releases remaining adapters
-		adapters.erase(adapters.begin() + index);
 		auto release = [](IDXGIAdapter1* adapter) { adapter->Release(); };
 		std::for_each(adapters.begin(), adapters.end(), release);
 	}
@@ -115,7 +120,50 @@ namespace Renderer
 
 	void Renderer::createDevice() 
 	{
-	
+		std::array<D3D_FEATURE_LEVEL, 7> featureLevelInputs{
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_0,
+			D3D_FEATURE_LEVEL_9_3,
+			D3D_FEATURE_LEVEL_9_2,
+			D3D_FEATURE_LEVEL_9_1
+		};
+
+		D3D_FEATURE_LEVEL featureLevelOutputs = featureLevelInputs[0];
+
+		unsigned int flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+
+		#ifdef _DEBUG
+			flags |= D3D11_CREATE_DEVICE_DEBUG;
+		#endif // _DEBUG
+
+		ID3D11Device* device = nullptr;
+		ID3D11DeviceContext* context = nullptr;
+
+		auto createDeviceResult = D3D11CreateDevice(
+			m_adapter.Get(),
+			D3D_DRIVER_TYPE_UNKNOWN,
+			nullptr,
+			flags,
+			featureLevelInputs.data(),
+			7,
+			D3D11_SDK_VERSION,
+			&device,
+			&featureLevelOutputs,
+			&context
+		);
+
+		if(createDeviceResult != S_OK)
+		{
+			throw std::runtime_error("Failed to create device!");
+		}
+
+		device->QueryInterface(m_device.GetAddressOf());
+		context->QueryInterface(m_context.GetAddressOf());
+
+		device->Release();
+		context->Release();
 	}
 
     //void Renderer::setDrawColor(const Color& color)
