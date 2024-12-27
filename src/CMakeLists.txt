@@ -18,7 +18,7 @@ if(WIN32)
 		d3dcompiler
 		Microsoft::DirectXTK
 	)
-else()
+elseif(UNIX)
 	target_link_libraries(${PROJECT_NAME} PRIVATE 
 		SDL3::SDL3
 		glm::glm

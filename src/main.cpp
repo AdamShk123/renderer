@@ -42,10 +42,10 @@ void run(Renderer::Renderer& renderer)
 			}
 		}
 
-        Renderer::Color color{0xD0, 0xD0, 0xD0, 0xFF};
-        renderer.setDrawColor(color);
-        renderer.clear();
-        renderer.present();
+        //Renderer::Color color{0xD0, 0xD0, 0xD0, 0xFF};
+        //renderer.setDrawColor(color);
+        //renderer.clear();
+        //renderer.present();
 
 		last = SDL_GetTicks();
 
