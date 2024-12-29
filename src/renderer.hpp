@@ -30,6 +30,18 @@ namespace Renderer
     //    uint8_t a;
     //};
 
+    constexpr std::string_view WINDOW_TITLE = "Renderer";
+    constexpr unsigned int WINDOW_WIDTH = 800;
+    constexpr unsigned int WINDOW_HEIGHT = 600;
+
+    inline void CheckIfFailed(HRESULT result, const std::string& message)
+    {
+        if (result != S_OK)
+        {
+            throw std::runtime_error(message);
+        }
+    }
+
 	class Renderer
 	{
 	public:
@@ -48,11 +60,14 @@ namespace Renderer
         Microsoft::WRL::ComPtr<IDXGIAdapter4> m_adapter = nullptr;
         Microsoft::WRL::ComPtr<ID3D11Device5> m_device = nullptr;
         Microsoft::WRL::ComPtr<ID3D11DeviceContext4> m_context = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Debug> m_debug = nullptr;
+        Microsoft::WRL::ComPtr<IDXGISwapChain4> m_swap = nullptr;
 
         void initSDL();
         void createFactory();
         void findAdapter();
         void createDevice();
+        void createSwapChain();
 	};
 }
 

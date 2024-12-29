@@ -1,5 +1,7 @@
 #include "renderer.hpp"
 
+using Microsoft::WRL::ComPtr;
+
 namespace Renderer 
 {
 	Renderer::Renderer() 
@@ -8,6 +10,7 @@ namespace Renderer
 		createFactory();
 		findAdapter();
 		createDevice();
+		createSwapChain();
 	}
 
 	void Renderer::initSDL() 
@@ -29,9 +32,9 @@ namespace Renderer
 		constexpr auto windowFlags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE);
 
 		m_window = SDL_CreateWindow(
-			"Renderer",
-			800,
-			600,
+			WINDOW_TITLE.data(),
+			WINDOW_WIDTH,
+			WINDOW_HEIGHT,
 			windowFlags
 		);
 
@@ -56,12 +59,9 @@ namespace Renderer
 				constexpr unsigned int createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
 		#endif
 
-		auto createFactoryResult = CreateDXGIFactory2(createFactoryFlags, __uuidof(m_factory), (void**)m_factory.ReleaseAndGetAddressOf());
+		auto result = CreateDXGIFactory2(createFactoryFlags, __uuidof(m_factory), (void**)m_factory.ReleaseAndGetAddressOf());
 
-		if (createFactoryResult != S_OK)
-		{
-			throw std::runtime_error("Failed to create factory!");
-		}
+		CheckIfFailed(result, "Failed to create factory!");
 	}
 
 	void Renderer::findAdapter() 
@@ -138,8 +138,8 @@ namespace Renderer
 			flags |= D3D11_CREATE_DEVICE_DEBUG;
 		#endif // _DEBUG
 
-		ID3D11Device* device = nullptr;
-		ID3D11DeviceContext* context = nullptr;
+		ComPtr<ID3D11Device> device = nullptr;
+		ComPtr<ID3D11DeviceContext> context = nullptr;
 
 		auto createDeviceResult = D3D11CreateDevice(
 			m_adapter.Get(),
@@ -147,23 +147,49 @@ namespace Renderer
 			nullptr,
 			flags,
 			featureLevelInputs.data(),
-			7,
+			static_cast<unsigned int>(featureLevelInputs.size()),
 			D3D11_SDK_VERSION,
-			&device,
+			device.GetAddressOf(),
 			&featureLevelOutputs,
-			&context
+			context.GetAddressOf()
 		);
 
-		if(createDeviceResult != S_OK)
-		{
-			throw std::runtime_error("Failed to create device!");
-		}
+		CheckIfFailed(createDeviceResult, "Failed to create device!");
 
-		device->QueryInterface(m_device.GetAddressOf());
-		context->QueryInterface(m_context.GetAddressOf());
+		CheckIfFailed(device.As(&m_device), "Failed to convert interface!");
+		CheckIfFailed(context.As(&m_context), "Failed to convert interface!");
 
-		device->Release();
-		context->Release();
+		#ifdef _DEBUG
+		m_device->QueryInterface(__uuidof(ID3D11Debug), &m_debug);
+		#endif
+	}
+
+	void Renderer::createSwapChain() 
+	{
+		DXGI_SWAP_CHAIN_DESC swapChainDesc{};
+		swapChainDesc.BufferCount = 1;
+		swapChainDesc.BufferDesc.Width = WINDOW_WIDTH;
+		swapChainDesc.BufferDesc.Height = WINDOW_HEIGHT;
+		swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.OutputWindow = m_handle;
+		swapChainDesc.SampleDesc.Count = 1;
+		swapChainDesc.SampleDesc.Quality = 0;
+		swapChainDesc.Windowed = TRUE;
+
+		ComPtr<IDXGISwapChain> temp = nullptr;
+
+		auto createSwapChainResult = m_factory->CreateSwapChain(
+			m_device.Get(),
+			&swapChainDesc,
+			temp.GetAddressOf()
+		);
+
+		CheckIfFailed(createSwapChainResult, "Failed to init swap chain!");
+
+		CheckIfFailed(temp.As(&m_swap), "Failed to convert interface!");
 	}
 
     //void Renderer::setDrawColor(const Color& color)
