@@ -4,8 +4,12 @@
 #include <iostream>
 #include <cstdint>
 
-#include "renderer.hpp"
+#if _WIN32
+	#include "windows_renderer.hpp"
+#elif __linux__
+	#include "linux_renderer.hpp"
+#endif
 
-void run(Renderer::Renderer& renderer);
+void run(std::unique_ptr<Renderer::IRenderer>& renderer);
 
 #endif // MAIN_HPP

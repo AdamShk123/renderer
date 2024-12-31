@@ -10,7 +10,11 @@ int main(int argc, char* argv[])
 		std::cout << argv[i] << std::endl;
 	}
 
-	auto renderer = Renderer::Renderer();
+	#if _WIN32
+		std::unique_ptr<Renderer::IRenderer> renderer = std::make_unique<Renderer::WindowsRenderer>();
+	#elif __linux__
+		std::unique_ptr<Renderer::IRenderer> renderer = std::make_unique<Renderer::LinuxRenderer>();
+	#endif
 
 	run(renderer);
 
@@ -19,7 +23,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void run(Renderer::Renderer& renderer)
+void run(std::unique_ptr<Renderer::IRenderer>& renderer)
 {
 	std::cout << &renderer << std::endl;
 
@@ -42,10 +46,11 @@ void run(Renderer::Renderer& renderer)
 			}
 		}
 
-        //Renderer::Color color{0xD0, 0xD0, 0xD0, 0xFF};
+        //WindowsRenderer::Color color{0xD0, 0xD0, 0xD0, 0xFF};
         //renderer.setDrawColor(color);
         //renderer.clear();
         //renderer.present();
+		renderer->drawTriangle();
 
 		last = SDL_GetTicks();
 

@@ -1,10 +1,10 @@
-#include "renderer.hpp"
+#include "windows_renderer.hpp"
 
 using Microsoft::WRL::ComPtr;
 
 namespace Renderer 
 {
-	Renderer::Renderer() 
+	WindowsRenderer::WindowsRenderer() 
 	{
 		initSDL();
 		createFactory();
@@ -13,7 +13,7 @@ namespace Renderer
 		createSwapChain();
 	}
 
-	void Renderer::initSDL() 
+	void WindowsRenderer::initSDL() 
 	{
 		const auto metadataResult = SDL_SetAppMetadata("Renderer", "1.0.0", "com.example.renderer");
 
@@ -51,7 +51,7 @@ namespace Renderer
 		}
 	}
 
-	void Renderer::createFactory() 
+	void WindowsRenderer::createFactory() 
 	{
 		#ifndef _DEBUG
 				constexpr unsigned int createFactoryFlags = 0;
@@ -64,7 +64,7 @@ namespace Renderer
 		CheckIfFailed(result, "Failed to create factory!");
 	}
 
-	void Renderer::findAdapter() 
+	void WindowsRenderer::findAdapter() 
 	{
 		std::vector<IDXGIAdapter1*> adapters{};
 
@@ -110,7 +110,7 @@ namespace Renderer
 		std::for_each(adapters.begin(), adapters.end(), release);
 	}
 
-	Renderer::~Renderer()
+	WindowsRenderer::~WindowsRenderer()
 	{
 		SDL_DestroyWindow(m_window);
 		m_window = nullptr;
@@ -118,7 +118,7 @@ namespace Renderer
 		SDL_Quit();
 	}
 
-	void Renderer::createDevice() 
+	void WindowsRenderer::createDevice() 
 	{
 		std::array<D3D_FEATURE_LEVEL, 7> featureLevelInputs{
 			D3D_FEATURE_LEVEL_11_1,
@@ -164,7 +164,7 @@ namespace Renderer
 		#endif
 	}
 
-	void Renderer::createSwapChain() 
+	void WindowsRenderer::createSwapChain() 
 	{
 		DXGI_SWAP_CHAIN_DESC swapChainDesc{};
 		swapChainDesc.BufferCount = 1;
@@ -178,6 +178,10 @@ namespace Renderer
 		swapChainDesc.SampleDesc.Count = 1;
 		swapChainDesc.SampleDesc.Quality = 0;
 		swapChainDesc.Windowed = TRUE;
+		swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		swapChainDesc.Flags = 0;
 
 		ComPtr<IDXGISwapChain> temp = nullptr;
 
@@ -192,17 +196,22 @@ namespace Renderer
 		CheckIfFailed(temp.As(&m_swap), "Failed to convert interface!");
 	}
 
-    //void Renderer::setDrawColor(const Color& color)
+	void WindowsRenderer::drawTriangle() 
+	{
+		std::cout << "drawTriangle() called!" << std::endl;
+	}
+
+    //void WindowsRenderer::setDrawColor(const Color& color)
     //{
     //    SDL_SetRenderDrawColor(m_renderer, color.r, color.g, color.b, color.a);
     //}
 
-    //void Renderer::clear() const
+    //void WindowsRenderer::clear() const
     //{
     //    SDL_RenderClear(m_renderer);
     //}
 
-    //void Renderer::present() const
+    //void WindowsRenderer::present() const
     //{
     //    SDL_RenderPresent(m_renderer);
     //}

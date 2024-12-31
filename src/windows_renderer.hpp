@@ -1,5 +1,5 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#ifndef WINDOWS_RENDERER_HPP
+#define WINDOWS_RENDERER_HPP
 
 #if _WIN32
 #elif __linux__
@@ -19,6 +19,8 @@
 #include <d3d11_4.h>
 #include <windows.h>
 #include <D3DCompiler.h>
+
+#include "interface_renderer.hpp"
 
 namespace Renderer
 {
@@ -42,11 +44,13 @@ namespace Renderer
         }
     }
 
-	class Renderer
+    class WindowsRenderer : public IRenderer
 	{
 	public:
-		Renderer();
-		~Renderer();
+		WindowsRenderer();
+		~WindowsRenderer() override;
+
+        void drawTriangle() override;
 
         //void setDrawColor(const Color& color);
         //void clear() const;
@@ -71,4 +75,4 @@ namespace Renderer
 	};
 }
 
-#endif // RENDERER_HPP
+#endif // WINDOWS_RENDERER_HPP
