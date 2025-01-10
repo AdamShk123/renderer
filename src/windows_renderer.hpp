@@ -11,6 +11,7 @@
 #include <vector>
 #include <algorithm>
 #include <ranges>
+#include <array>
 
 #include <SDL3/SDL.h>
 
@@ -31,6 +32,18 @@ namespace Renderer
     //    uint8_t b;
     //    uint8_t a;
     //};
+
+    struct Vertex
+    {
+        std::array<float,3> position;
+        std::array<float,3> color;
+    };
+
+    constexpr std::array<Vertex,3> vertexBufferData{ {
+        {{1.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+        {{-1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+        {{0.0f, -1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}
+    } };
 
     constexpr std::string_view WINDOW_TITLE = "Renderer";
     constexpr unsigned int WINDOW_WIDTH = 800;
@@ -66,12 +79,22 @@ namespace Renderer
         Microsoft::WRL::ComPtr<ID3D11DeviceContext4> m_context = nullptr;
         Microsoft::WRL::ComPtr<ID3D11Debug> m_debug = nullptr;
         Microsoft::WRL::ComPtr<IDXGISwapChain4> m_swap = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> m_backbufferTex = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthStencilBuffer = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depthStencilView = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer = nullptr;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer = nullptr;
 
         void initSDL();
         void createFactory();
         void findAdapter();
         void createDevice();
         void createSwapChain();
+        void createRenderViewTarget();
+        void createVertexBuffer();
+        void createIndexBuffer();
 	};
 }
 

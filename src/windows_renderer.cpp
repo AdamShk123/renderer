@@ -11,6 +11,9 @@ namespace Renderer
 		findAdapter();
 		createDevice();
 		createSwapChain();
+		createRenderViewTarget();
+		createVertexBuffer();
+		createIndexBuffer();
 	}
 
 	void WindowsRenderer::initSDL() 
@@ -194,6 +197,73 @@ namespace Renderer
 		CheckIfFailed(createSwapChainResult, "Failed to init swap chain!");
 
 		CheckIfFailed(temp.As(&m_swap), "Failed to convert interface!");
+	}
+
+	void WindowsRenderer::createRenderViewTarget()
+	{
+		auto getBufferResult = m_swap->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)m_backbufferTex.GetAddressOf());
+
+		CheckIfFailed(getBufferResult,"");
+
+		auto createRenderTargetViewResult = m_device->CreateRenderTargetView(m_backbufferTex.Get(), nullptr, m_renderTargetView.GetAddressOf());
+
+		CheckIfFailed(createRenderTargetViewResult,"");
+
+		// Create the texture for the depth buffer.
+		D3D11_TEXTURE2D_DESC depthBufferDesc{};
+		depthBufferDesc.Width = 800;
+		depthBufferDesc.Height = 600;
+		depthBufferDesc.MipLevels = 1;
+		depthBufferDesc.ArraySize = 1;
+		depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthBufferDesc.SampleDesc.Count = 1;
+		depthBufferDesc.SampleDesc.Quality = 0;
+		depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthBufferDesc.CPUAccessFlags = 0;
+		depthBufferDesc.MiscFlags = 0;
+
+		CheckIfFailed(m_device->CreateTexture2D(&depthBufferDesc, nullptr, m_depthStencilBuffer.GetAddressOf()), "");
+
+		// Create the depth stencil view.
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc{};
+		depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		depthStencilViewDesc.Texture2D.MipSlice = 0;
+		CheckIfFailed(m_device->CreateDepthStencilView(
+			m_depthStencilBuffer.Get(), 
+			&depthStencilViewDesc, 
+			m_depthStencilView.GetAddressOf()), 
+			""
+		);
+	}
+
+	void WindowsRenderer::createVertexBuffer()
+	{
+		D3D11_BUFFER_DESC bufferDesc{};
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		bufferDesc.ByteWidth = static_cast<unsigned int>(sizeof(Vertex) * vertexBufferData.size());
+		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.MiscFlags = 0;
+		bufferDesc.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA bufferData{};
+		bufferData.pSysMem = (void*)vertexBufferData.data();
+		bufferData.SysMemPitch = 0;
+		bufferData.SysMemSlicePitch = 0;
+
+		auto createBufferResult = m_device->CreateBuffer(
+			&bufferDesc,
+			&bufferData,
+			m_vertexBuffer.GetAddressOf()
+		);
+
+		CheckIfFailed(createBufferResult,"");
+	}
+
+	void WindowsRenderer::createIndexBuffer()
+	{
 	}
 
 	void WindowsRenderer::drawTriangle() 
