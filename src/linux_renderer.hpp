@@ -10,10 +10,15 @@
 
 #include <SDL3/SDL.h>
 
+#include<glad/glad.h>
+
 #include "interface_renderer.hpp"
 
 namespace Renderer
 {
+    constexpr std::string_view WINDOW_TITLE = "Renderer";
+    constexpr unsigned int WINDOW_WIDTH = 800;
+    constexpr unsigned int WINDOW_HEIGHT = 600;
 
     class LinuxRenderer : public IRenderer
     {
@@ -22,7 +27,11 @@ namespace Renderer
         ~LinuxRenderer() override;
 
         void drawTriangle() override;
+        void clear() override;
+        void present() override;
     private:
+        SDL_Window* m_window = nullptr;
+        SDL_GLContext m_context = nullptr;
     };
 }
 

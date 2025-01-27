@@ -17,7 +17,7 @@ if(WIN32)
 elseif(UNIX)
 	find_package(glm CONFIG REQUIRED)
 
-	add_executable (${PROJECT_NAME} "main.cpp" "linux_renderer.cpp")
+	add_executable (${PROJECT_NAME} "main.cpp" "linux_renderer.cpp" "glad.cpp")
 
 	target_link_libraries(${PROJECT_NAME} PRIVATE 
 		SDL3::SDL3

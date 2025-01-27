@@ -25,8 +25,6 @@ int main(int argc, char* argv[])
 
 void run(std::unique_ptr<Renderer::IRenderer>& renderer)
 {
-	std::cout << &renderer << std::endl;
-
 	bool done = false;
 
 	SDL_Event event;
@@ -46,15 +44,16 @@ void run(std::unique_ptr<Renderer::IRenderer>& renderer)
 			}
 		}
 
-        //WindowsRenderer::Color color{0xD0, 0xD0, 0xD0, 0xFF};
-        //renderer.setDrawColor(color);
-        //renderer.clear();
-        //renderer.present();
-		renderer->drawTriangle();
+        Renderer::Color color{0xB0, 0xB0, 0xB0, 0xFF};
+        renderer->setColor(color);
+
+        renderer->clear();
+
+        renderer->present();
 
 		last = SDL_GetTicks();
 
-		double fps = 1000.0 / static_cast<double>(last - start);
+        double fps = 1000.0 / static_cast<double>(last - start);
 		std::cout << "FPS: " << fps << std::endl;
 	}
 }

@@ -12,6 +12,10 @@
     },
     "gtest",
     "sdl3",
-    "stb"
+    "stb",
+    {
+      "name": "glad",
+      "platform": "linux"
+    }
   ]
 }
